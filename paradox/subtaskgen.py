@@ -1,5 +1,6 @@
 from jiralite.utils import contains
 from jiralite.defaults import SUMMARY_TEMPLATE, DESCRIPTION_TEMPLATE
+from flask import (redirect, render_template)
 
 class SubTaskAutoGen(object):
 	CHAR_CROSS_BOLD = u'\u2716'
@@ -82,22 +83,4 @@ class SubTaskAutoGen(object):
 
 
 	def report(self):
-		return r'''
-		<html>
-			<head>
-				<title>SubTaskAutoGen Report</title>
-			</head>
-			<body style="background-color: black;
-						color: white">
-				<div>Issues with pending DBA or Code Review: {}</div>
-				<div>Issues in build list but no in deployment issue: {}</div>
-				<div>Missing Sub-tasks: {}</div>
-				<pre>Sub-tasks created: {}</pre>
-			</body>
-		</html>'''.format(
-			len(self.issues_with_pending_dba_or_code_review),
-			len(self.build_issues_not_in_deployment_issue),
-			len(self.build_issues_without_subtask),
-			len(self._report))
-
-
+		return self

@@ -21,13 +21,14 @@ JIRA_PASSWORD = os.environ.get('JIRA_PASSWORD')
 
 from .subtaskgen import SubTaskAutoGen
 from jiralite import jiralite
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return 'some documentation'
+	variable="Victor"
+	return render_template('base.html')
 
 
 @app.route('/<username>')
@@ -52,7 +53,7 @@ def subtaskgen():
 
 	bot = SubTaskAutoGen(**settings)
 	bot.run()
-	return bot.report()
+	return render_template('subtaskgen/report.html', data=bot.report())
 
 
-app.run(debug=True, port=8080)
+# app.run(debug=True, port=8080)
