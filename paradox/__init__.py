@@ -10,50 +10,42 @@ handler.setLevel(logging.DEBUG)
 handler.setFormatter(formatter)
 log.addHandler(handler)
 
-# log_file = os.path.join(os.path.abspath('.'), "paradox.log")
-# logging.basicConfig(filename=log_file, level=logging.DEBUG)
-
 import os
 
 JIRA_API = os.environ.get('JIRA_API')
 JIRA_USERNAME = os.environ.get('JIRA_USERNAME')
 JIRA_PASSWORD = os.environ.get('JIRA_PASSWORD')
+credentials = (JIRA_USERNAME, JIRA_PASSWORD)
 
-from .subtaskgen import SubTaskAutoGen
+from .subtasks import SubTaskGenerator
 from jiralite import jiralite
+
+jira = jiralite(JIRA_API, credentials)
+
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-	variable="Victor"
 	return render_template('base.html')
 
 
-@app.route('/<username>')
-def hello_user(username):
-	return 'Hello ' + username
+# Subtask Generator
+@app.route('/subtasks', methods=['GET'])
+def subtasks_index():
+	return render_template('subtasks/index.html')
 
 
-@app.route('/subtaskgen')
-def subtaskgen():
+@app.route('/api/v1/subtasks')
+def subtasks():
 	deployment_issue = request.args.get('deployment_issue')
 	build_issues = request.args.get('build_issues')
 	build_issues = build_issues.split(',')
 
-	credentials = (JIRA_USERNAME, JIRA_PASSWORD)
-	jira = jiralite(JIRA_API, credentials)
-
-	settings = {
-		"jiraclient": jira,
-		"deployment_issue": jira.issue(deployment_issue, deployment=True),
-		"build_issues": [jira.issue(issue.strip()) for issue in build_issues]
-	}
-
-	bot = SubTaskAutoGen(**settings)
-	bot.run()
-	return render_template('subtaskgen/report.html', data=bot.report())
-
-
-# app.run(debug=True, port=8080)
+	Generator = SubTaskGenerator(
+		jiraclient=jira,
+		deployment_issue=jira.issue(deployment_issue.strip()),
+		build_issues=[jira.issue(issue.strip()) for issue in build_issues])
+	Generator.run()
+	return render_template('subtasks/report.html', data=Generator.report())

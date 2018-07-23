@@ -1,8 +1,9 @@
 from jiralite.utils import contains
 from jiralite.defaults import SUMMARY_TEMPLATE, DESCRIPTION_TEMPLATE
-from flask import (redirect, render_template)
+from .handlers import DeploymentIssueHanlder
 
-class SubTaskAutoGen(object):
+
+class SubTaskGenerator(object):
 	CHAR_CROSS_BOLD = u'\u2716'
 	CHAR_CROSS = u'\u2715'
 	CHAR_CHECK_BOLD = u'\u2714'
@@ -12,6 +13,7 @@ class SubTaskAutoGen(object):
 		self._jira = jiraclient
 		self._deployment = deployment_issue
 		self._build = build_issues
+		self._parsed_deployment = DeploymentIssueHanlder(deployment_issue)
 		self._compare_build_and_deployment()
 		self._get_issues_with_pending_dba_or_code_review()
 		
@@ -24,10 +26,11 @@ class SubTaskAutoGen(object):
 	def _compare_build_and_deployment(self):
 		self.build_issues_in_deployment_issue = []
 		self.build_issues_not_in_deployment_issue = []
+		self.build_issues_with_subtask = []
 		self.build_issues_without_subtask = []
 
 		for issue in self._build:
-			instructions = self._deployment.get_instructions()
+			instructions = self._parsed_deployment.get_instructions()
 			if issue.key in instructions:
 				self.build_issues_in_deployment_issue.append(issue.key)
 
@@ -36,6 +39,8 @@ class SubTaskAutoGen(object):
 				has_subtask = self._deployment.has_subtask(issue.key)
 				if is_sql_script and not has_subtask:
 					self.build_issues_without_subtask.append(issue.key)
+				if has_subtask:
+					self.build_issues_with_subtask.append(issue.key)
 			else:
 				self.build_issues_not_in_deployment_issue.append(issue.key)
 
@@ -62,11 +67,11 @@ class SubTaskAutoGen(object):
 		if not self.can_subtasks_be_created():
 			return None
 
-		self._report = {}
+		self.subtask_created = []
 		for issue in self._build:
 			if issue.key in self.build_issues_without_subtask:
-				deploy = self._deployment.get_instructions(issue.key)
-				revert = self._deployment.get_revert_instructions(issue.key)
+				deploy = self._parsed_deployment.get_instructions(issue.key)
+				revert = self._parsed_deployment.get_revert_instructions(issue.key)
 				summary = SUMMARY_TEMPLATE.format(issue.key)
 				description = DESCRIPTION_TEMPLATE.format(
 					'\r\n# '.join(deploy), '\r\n# '.join(revert))
@@ -76,10 +81,9 @@ class SubTaskAutoGen(object):
 
 				try:
 					response = response.json()
+					self.subtask_created.append(issue.key)
 				except:
 					response = None
-
-				self._report[issue.key] = response
 
 
 	def report(self):

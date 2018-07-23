@@ -1,2 +1,0 @@
-/home/vnatschke/Workspaces/python/libs/jiralite/dist/jiralite-1.0.0.tar.gz
-flask==1.0.2

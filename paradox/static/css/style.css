@@ -12,14 +12,15 @@
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
 
+/* General */
 body {
-	background-color: whitesmoke;
+	/* background-color: whitesmoke; */
 	color: #5a6169;
 }
 
 .paradox-logo {
 	margin: 0 10px;
-	width: 32px;
+	width: 30px;
 	height: 30px
 }
 
@@ -32,7 +33,37 @@ path.flame {
 	fill: red;
 }
 
+.font-small {
+	font-size: small;
+}
+
+.color-blue {
+	color: #007bff;
+}
+
 /*  bootstrap */
+.card,
+.card-header {
+	border-radius: 0 !important;
+}
+
 .card {
+	/* background-color: whitesmoke; */
+	border: 1px solid #ccc9c9;
+	box-shadow: none;
+}
+
+.card-header {
+	background-color: whitesmoke;
+	border-bottom: 1px solid #ccc9c9;
+}
+
+.btn {
 	border-radius: 3px;
+}
+
+
+/* subtaskgen */
+#subtaskgen {
+	/* background-color: gray; */
 }

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Subtasks{% endblock %}
+{% block notification %}
+<div class="alert alert-secondary" role="alert">
+	<div class="container">
+		Generate subtasks for a deployment issue based on the issues available in a build 
+	</div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container">
+	<div class="row mb-4">
+		<div class="col-12">
+			<form action="/api/v1/subtasks" method="GET" autocomplete="off">
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Subtask Generator</h5>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="form-group col-md-4 col-4">
+								<label for="form1-name" class="col-form-label">Deployment Issue</label>
+								<input type="text" class="form-control" id="deployment_issue" name="deployment_issue" placeholder="ID" required="required"/>
+							</div>
+							<div class="form-group col-md-8 col-8">
+								<label for="form1-email" class="col-form-label">Build Issues</label> 
+								<i class="material-icons md-18 color-blue" data-toggle="tooltip" data-placement="right" title="Comma Separated Values">info</i>
+								<textarea class="form-control" id="build_issues" name="build_issues"placeholder="ID1,ID2,ID3" required="required" rows="2"></textarea>
+							</div>
+						</div>
+						<input type="submit" class="btn btn-primary float-right" value="Generate!"/>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
