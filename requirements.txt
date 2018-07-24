@@ -1,2 +1,2 @@
-./jiralite-1.0.0.tar.gz
+./lib/jiralite-1.0.0.tar.gz
 flask==1.0.2

@@ -6,18 +6,17 @@ RUN pip3 install virtualenv
 RUN virtualenv /opt/paradox/venv
 
 # setup environmnet variables
-ENV JIRA_API=${JIRA_API}
-ENV JIRA_USERNAME=${JIRA_USERNAME}
-ENV JIRA_PASSWORD=${JIRA_PASSWORD}
-ENV FLASK_APP=${FLASK_APP}
-ENV FLASK_ENV=${FLASK_ENV}
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV FLASK_APP=paradox
 
 # setup virtualenv
 WORKDIR /opt/paradox
-RUN source venv/bin/activate
+COPY ./lib ./lib
+COPY ./paradox ./paradox
 COPY requirements.txt ./
-COPY lib/jiralite-1.0.0.tar.gz ./
-RUN pip install --no-cache-dir -r requirements.txt
-COPY paradox .
+RUN chmod 700 ./entrypoint.sh
+COPY entrypoint.sh ./
+RUN /bin/bash -c ". venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
 
-CMD [ "flask run" ]
+CMD [ "/opt/paradox/entrypoint.sh" ]
